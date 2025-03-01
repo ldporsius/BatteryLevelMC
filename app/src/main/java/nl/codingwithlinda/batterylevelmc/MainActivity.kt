@@ -92,31 +92,63 @@ class MainActivity : ComponentActivity() {
                         
                         Row(
                             modifier = Modifier
-                                .height(200.dp)
+                                .height(100.dp)
                                 .fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
                         ) {
                             Icon(
                                painter = painterResource(R.drawable.vector),
                                 contentDescription = null,
                                 tint = batteryLevelIconLowColor
                             )
+
                             Box(modifier = Modifier
                                 .fillMaxWidth()
-                                .background(color = surfaceHigh,
+                                .background(color = surface,
                                     shape = RoundedCornerShape(16.dp)
                                 )
                                 .weight(1f)
                                 .padding(2.dp)
                                 .drawBehind {
                                     val maxSize = this.size
+                                    val sizeBattery = maxSize.width * 0.97f
+
+                                    drawRoundRect(
+                                        color = surfaceHigh,
+                                        size = Size(
+                                            width = maxSize.width,
+                                            height = maxSize.height / 2f
+                                        ),
+                                        topLeft = Offset(
+                                            x = 0f, y = maxSize.height / 2f / 2
+                                        ),
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                                            16.dp.toPx(), 16.dp.toPx()
+                                        )
+                                    )
+
+                                    drawRoundRect(
+                                        color = surfaceHigh,
+                                        size = Size(
+                                            width = sizeBattery,
+                                            height = maxSize.height
+                                        ),
+                                        topLeft = Offset(
+                                            x = 0f, y = 0f
+                                        ),
+                                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(
+                                            16.dp.toPx(), 16.dp.toPx()
+                                        )
+                                    )
+
 
                                     val indicatorBlockScaleFactor  = batteryLevel?.div(100) ?: 0f
 
                                     drawRoundRect(
                                         color = batteryLevelIndicatorColor,
                                         size = Size(
-                                            width = maxSize.width * indicatorBlockScaleFactor,
+                                            width = sizeBattery * indicatorBlockScaleFactor,
                                             height = maxSize.height
                                         ),
                                         topLeft = Offset(
