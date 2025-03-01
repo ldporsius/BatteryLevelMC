@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -40,6 +41,8 @@ import nl.codingwithlinda.batterylevelmc.data.BatteryLevelIndicator
 import nl.codingwithlinda.batterylevelmc.data.BatteryLevelManager
 import nl.codingwithlinda.batterylevelmc.presentation.mapBatteryLevelToIndicator
 import nl.codingwithlinda.batterylevelmc.presentation.toColor
+import nl.codingwithlinda.batterylevelmc.presentation.toIconHighColor
+import nl.codingwithlinda.batterylevelmc.presentation.toIconLowColor
 import nl.codingwithlinda.batterylevelmc.ui.theme.BatteryLevelMCTheme
 import nl.codingwithlinda.batterylevelmc.ui.theme.orange
 import nl.codingwithlinda.batterylevelmc.ui.theme.surface
@@ -56,11 +59,15 @@ class MainActivity : ComponentActivity() {
             var batteryLevel: Float? by remember {
                 mutableStateOf(0f)
             }
-            val batteryLevelIndicatorColor = remember(batteryLevel) {
+            val batteryLevelIndicator: BatteryLevelIndicator by remember {
                 derivedStateOf {
-                mapBatteryLevelToIndicator(batteryLevel ?: 0f)
-            }.value.toColor()
+                    mapBatteryLevelToIndicator(batteryLevel ?: 0f)
+                }
             }
+            val batteryLevelIndicatorColor = batteryLevelIndicator.toColor()
+            val batteryLevelIconLowColor = batteryLevelIndicator.toIconLowColor()
+            val batteryLevelIconHighColor = batteryLevelIndicator.toIconHighColor()
+
 
             LaunchedEffect(true) {
                 while (true){
@@ -90,7 +97,9 @@ class MainActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Check, contentDescription = null
+                               painter = painterResource(R.drawable.vector),
+                                contentDescription = null,
+                                tint = batteryLevelIconLowColor
                             )
                             Box(modifier = Modifier
                                 .fillMaxWidth()
@@ -141,7 +150,9 @@ class MainActivity : ComponentActivity() {
                             }
 
                             Icon(
-                                imageVector = Icons.Default.Settings, contentDescription = null
+                                painter = painterResource(R.drawable.union),
+                                contentDescription = null,
+                                tint = batteryLevelIconHighColor
                             )
                         }
                     }
