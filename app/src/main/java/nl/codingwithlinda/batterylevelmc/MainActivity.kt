@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -68,6 +69,10 @@ class MainActivity : ComponentActivity() {
             val batteryLevelIconLowColor = batteryLevelIndicator.toIconLowColor()
             val batteryLevelIconHighColor = batteryLevelIndicator.toIconHighColor()
 
+            val animatedLevelWidth = animateFloatAsState(
+                targetValue = batteryLevel?.div(100) ?: 0f,
+                label = "animatedLevelWidth"
+            )
 
             LaunchedEffect(true) {
                 while (true){
@@ -93,7 +98,9 @@ class MainActivity : ComponentActivity() {
                         Row(
                             modifier = Modifier
                                 .height(100.dp)
-                                .fillMaxWidth(),
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                            ,
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
                         ) {
@@ -143,12 +150,12 @@ class MainActivity : ComponentActivity() {
                                     )
 
 
-                                    val indicatorBlockScaleFactor  = batteryLevel?.div(100) ?: 0f
+                                    //val indicatorBlockScaleFactor  = batteryLevel?.div(100) ?: 0f
 
                                     drawRoundRect(
                                         color = batteryLevelIndicatorColor,
                                         size = Size(
-                                            width = sizeBattery * indicatorBlockScaleFactor,
+                                            width = sizeBattery * animatedLevelWidth.value,
                                             height = maxSize.height
                                         ),
                                         topLeft = Offset(
