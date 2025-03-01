@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,7 +36,10 @@ import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import nl.codingwithlinda.batterylevelmc.data.BatteryLevelIndicator
 import nl.codingwithlinda.batterylevelmc.data.BatteryLevelManager
+import nl.codingwithlinda.batterylevelmc.presentation.mapBatteryLevelToIndicator
+import nl.codingwithlinda.batterylevelmc.presentation.toColor
 import nl.codingwithlinda.batterylevelmc.ui.theme.BatteryLevelMCTheme
 import nl.codingwithlinda.batterylevelmc.ui.theme.orange
 import nl.codingwithlinda.batterylevelmc.ui.theme.surface
@@ -51,6 +55,11 @@ class MainActivity : ComponentActivity() {
 
             var batteryLevel: Float? by remember {
                 mutableStateOf(0f)
+            }
+            val batteryLevelIndicatorColor = remember(batteryLevel) {
+                derivedStateOf {
+                mapBatteryLevelToIndicator(batteryLevel ?: 0f)
+            }.value.toColor()
             }
 
             LaunchedEffect(true) {
@@ -96,7 +105,7 @@ class MainActivity : ComponentActivity() {
                                     val indicatorBlockScaleFactor  = batteryLevel?.div(100) ?: 0f
 
                                     drawRoundRect(
-                                        color = orange,
+                                        color = batteryLevelIndicatorColor,
                                         size = Size(
                                             width = maxSize.width * indicatorBlockScaleFactor,
                                             height = maxSize.height
@@ -125,7 +134,6 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                     }
-
                                 }
 
                             ) {
