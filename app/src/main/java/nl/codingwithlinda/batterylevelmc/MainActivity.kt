@@ -5,7 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -14,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -31,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.scale
@@ -40,12 +48,17 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import nl.codingwithlinda.batterylevelmc.data.BatteryLevelIndicator
 import nl.codingwithlinda.batterylevelmc.data.BatteryLevelManager
+import nl.codingwithlinda.batterylevelmc.presentation.applyIf
 import nl.codingwithlinda.batterylevelmc.presentation.mapBatteryLevelToIndicator
 import nl.codingwithlinda.batterylevelmc.presentation.toColor
 import nl.codingwithlinda.batterylevelmc.presentation.toIconHighColor
+import nl.codingwithlinda.batterylevelmc.presentation.toIconHighSize
 import nl.codingwithlinda.batterylevelmc.presentation.toIconLowColor
+import nl.codingwithlinda.batterylevelmc.presentation.toIconLowSize
 import nl.codingwithlinda.batterylevelmc.ui.theme.BatteryLevelMCTheme
 import nl.codingwithlinda.batterylevelmc.ui.theme.orange
+import nl.codingwithlinda.batterylevelmc.ui.theme.red
+import nl.codingwithlinda.batterylevelmc.ui.theme.redAlternative
 import nl.codingwithlinda.batterylevelmc.ui.theme.surface
 import nl.codingwithlinda.batterylevelmc.ui.theme.surfaceHigh
 import nl.codingwithlinda.batterylevelmc.ui.theme.surfaceLow
@@ -74,6 +87,32 @@ class MainActivity : ComponentActivity() {
                 label = "animatedLevelWidth"
             )
 
+            val infiniteAnimation = rememberInfiniteTransition(
+                label = "infiniteIconLowAnimation"
+            )
+            val animatedIconLowSize by infiniteAnimation.animateFloat(
+                initialValue = .9f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(500),
+                    repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+                ),
+                label = "animatedIconLowSize"
+            )
+
+            val animatedIconLowColor by infiniteAnimation.animateColor(
+                initialValue = red,
+                targetValue = redAlternative,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(500),
+                    repeatMode = androidx.compose.animation.core.RepeatMode.Reverse
+                ), label = "animatedIconLowColor"
+            )
+            val iconLowColor = if (batteryLevelIndicator == BatteryLevelIndicator.LOW) {
+                animatedIconLowColor
+            } else {
+                batteryLevelIconLowColor
+            }
             LaunchedEffect(true) {
                 while (true){
                     batteryLevelManager.batteryPct().also {level ->
@@ -107,7 +146,14 @@ class MainActivity : ComponentActivity() {
                             Icon(
                                painter = painterResource(R.drawable.vector),
                                 contentDescription = null,
-                                tint = batteryLevelIconLowColor
+                                modifier = Modifier
+                                    .applyIf(
+                                        batteryLevelIndicator == BatteryLevelIndicator.LOW,
+                                        Modifier.scale(animatedIconLowSize)
+                                        )
+                                    .size(batteryLevelIndicator.toIconLowSize().dp)
+                                    ,
+                                tint = iconLowColor
                             )
 
                             Box(modifier = Modifier
@@ -149,9 +195,6 @@ class MainActivity : ComponentActivity() {
                                         )
                                     )
 
-
-                                    //val indicatorBlockScaleFactor  = batteryLevel?.div(100) ?: 0f
-
                                     drawRoundRect(
                                         color = batteryLevelIndicatorColor,
                                         size = Size(
@@ -191,7 +234,8 @@ class MainActivity : ComponentActivity() {
                             Icon(
                                 painter = painterResource(R.drawable.union),
                                 contentDescription = null,
-                                tint = batteryLevelIconHighColor
+                                tint = batteryLevelIconHighColor,
+                                modifier = Modifier.size(batteryLevelIndicator.toIconHighSize().dp)
                             )
                         }
                     }

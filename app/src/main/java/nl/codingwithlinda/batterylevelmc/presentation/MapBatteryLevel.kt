@@ -5,6 +5,7 @@ import nl.codingwithlinda.batterylevelmc.data.BatteryLevelIndicator
 import nl.codingwithlinda.batterylevelmc.ui.theme.green
 import nl.codingwithlinda.batterylevelmc.ui.theme.orange
 import nl.codingwithlinda.batterylevelmc.ui.theme.red
+import nl.codingwithlinda.batterylevelmc.ui.theme.redAlternative
 import nl.codingwithlinda.batterylevelmc.ui.theme.surfaceLow
 
 fun mapBatteryLevelToIndicator(batteryLevel: Float): BatteryLevelIndicator {
@@ -37,3 +38,25 @@ fun BatteryLevelIndicator.toIconHighColor(): Color{
         BatteryLevelIndicator.HIGH -> green
     }
 }
+
+fun BatteryLevelIndicator.toIconLowSize(): Float{
+    return when(this){
+        BatteryLevelIndicator.LOW -> 48f
+        BatteryLevelIndicator.MEDIUM -> 32f
+        BatteryLevelIndicator.HIGH -> 32f
+    }
+}
+fun BatteryLevelIndicator.toIconHighSize(): Float{
+    return when(this){
+        BatteryLevelIndicator.LOW -> 32f
+        BatteryLevelIndicator.MEDIUM -> 32f
+        BatteryLevelIndicator.HIGH -> 48f
+    }
+}
+val lowerIndicatorAnimationColorList = listOf(
+    red,
+    redAlternative,
+    redAlternative.copy(.95f)
+)
+
+
