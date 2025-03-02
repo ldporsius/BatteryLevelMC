@@ -39,13 +39,14 @@ fun BatteryLevelIndicator.toIconHighColor(): Color{
     }
 }
 
-fun BatteryLevelIndicator.toIconLowSize(): Float{
+/*fun BatteryLevelIndicator.toIconLowSize(): Float{
     return when(this){
         BatteryLevelIndicator.LOW -> 48f
         BatteryLevelIndicator.MEDIUM -> 32f
         BatteryLevelIndicator.HIGH -> 32f
     }
-}
+}*/
+/*
 fun BatteryLevelIndicator.toIconHighSize(): Float{
     return when(this){
         BatteryLevelIndicator.LOW -> 32f
@@ -53,10 +54,6 @@ fun BatteryLevelIndicator.toIconHighSize(): Float{
         BatteryLevelIndicator.HIGH -> 48f
     }
 }
-val lowerIndicatorAnimationColorList = listOf(
-    red,
-    redAlternative,
-    redAlternative.copy(.95f)
-)
+*/
 
 

@@ -6,10 +6,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -45,9 +47,7 @@ import nl.codingwithlinda.batterylevelmc.presentation.applyIf
 import nl.codingwithlinda.batterylevelmc.presentation.mapBatteryLevelToIndicator
 import nl.codingwithlinda.batterylevelmc.presentation.toColor
 import nl.codingwithlinda.batterylevelmc.presentation.toIconHighColor
-import nl.codingwithlinda.batterylevelmc.presentation.toIconHighSize
 import nl.codingwithlinda.batterylevelmc.presentation.toIconLowColor
-import nl.codingwithlinda.batterylevelmc.presentation.toIconLowSize
 import nl.codingwithlinda.batterylevelmc.ui.theme.BatteryLevelMCTheme
 import nl.codingwithlinda.batterylevelmc.ui.theme.red
 import nl.codingwithlinda.batterylevelmc.ui.theme.redAlternative
@@ -75,6 +75,10 @@ class MainActivity : ComponentActivity() {
 
             val animatedLevelWidth = animateFloatAsState(
                 targetValue = batteryLevel?.div(100) ?: 0f,
+                animationSpec = spring(
+                    dampingRatio = 0.3f,
+                    stiffness = 100f
+                ),
                 label = "animatedLevelWidth"
             )
 
@@ -105,8 +109,14 @@ class MainActivity : ComponentActivity() {
                 batteryLevelIconLowColor
             }
 
+            val animateLowIconToMedium by animateFloatAsState(
+                targetValue = batteryLevelIndicator.lowIconSize(),
+                animationSpec = tween(1000),
+                label = "animatedIconLowSize"
+            )
+
             val animatedIconHighSize by animateFloatAsState(
-                targetValue = batteryLevelIndicator.toIconHighSize(),
+                targetValue = batteryLevelIndicator.highIconSize(),
                 animationSpec = tween(1000),
                 label = "animatedIconHighSize"
             )
@@ -115,7 +125,6 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(true) {
                 while (true){
                     batteryLevelManager.batteryPct().also {level ->
-                        println("Battery level is $level")
                         batteryLevel = level
                     }
                     delay(100)
@@ -151,7 +160,7 @@ class MainActivity : ComponentActivity() {
                                             batteryLevelIndicator == BatteryLevelIndicator.LOW,
                                             Modifier.scale(animatedIconLowSize)
                                         )
-                                        .size(batteryLevelIndicator.toIconLowSize().dp),
+                                        .size(animateLowIconToMedium.dp),
                                     tint = iconLowColor
                                 )
                             }
