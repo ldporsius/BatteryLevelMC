@@ -4,9 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -21,14 +20,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -41,9 +36,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import nl.codingwithlinda.batterylevelmc.data.BatteryLevelIndicator
@@ -56,12 +49,10 @@ import nl.codingwithlinda.batterylevelmc.presentation.toIconHighSize
 import nl.codingwithlinda.batterylevelmc.presentation.toIconLowColor
 import nl.codingwithlinda.batterylevelmc.presentation.toIconLowSize
 import nl.codingwithlinda.batterylevelmc.ui.theme.BatteryLevelMCTheme
-import nl.codingwithlinda.batterylevelmc.ui.theme.orange
 import nl.codingwithlinda.batterylevelmc.ui.theme.red
 import nl.codingwithlinda.batterylevelmc.ui.theme.redAlternative
 import nl.codingwithlinda.batterylevelmc.ui.theme.surface
 import nl.codingwithlinda.batterylevelmc.ui.theme.surfaceHigh
-import nl.codingwithlinda.batterylevelmc.ui.theme.surfaceLow
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -113,13 +104,21 @@ class MainActivity : ComponentActivity() {
             } else {
                 batteryLevelIconLowColor
             }
+
+            val animatedIconHighSize by animateFloatAsState(
+                targetValue = batteryLevelIndicator.toIconHighSize(),
+                animationSpec = tween(1000),
+                label = "animatedIconHighSize"
+            )
+
+            //probably hoist this in a viewmodel
             LaunchedEffect(true) {
                 while (true){
                     batteryLevelManager.batteryPct().also {level ->
                         println("Battery level is $level")
                         batteryLevel = level
                     }
-                    delay(1000)
+                    delay(100)
                 }
             }
             BatteryLevelMCTheme {
@@ -143,18 +142,19 @@ class MainActivity : ComponentActivity() {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(16.dp)
                         ) {
-                            Icon(
-                               painter = painterResource(R.drawable.vector),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .applyIf(
-                                        batteryLevelIndicator == BatteryLevelIndicator.LOW,
-                                        Modifier.scale(animatedIconLowSize)
+                            Box(modifier = Modifier.width(48.dp)) {
+                                Icon(
+                                    painter = painterResource(R.drawable.vector),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .applyIf(
+                                            batteryLevelIndicator == BatteryLevelIndicator.LOW,
+                                            Modifier.scale(animatedIconLowSize)
                                         )
-                                    .size(batteryLevelIndicator.toIconLowSize().dp)
-                                    ,
-                                tint = iconLowColor
-                            )
+                                        .size(batteryLevelIndicator.toIconLowSize().dp),
+                                    tint = iconLowColor
+                                )
+                            }
 
                             Box(modifier = Modifier
                                 .fillMaxWidth()
@@ -231,12 +231,19 @@ class MainActivity : ComponentActivity() {
                                 Spacer(Modifier.fillMaxSize())
                             }
 
-                            Icon(
-                                painter = painterResource(R.drawable.union),
-                                contentDescription = null,
-                                tint = batteryLevelIconHighColor,
-                                modifier = Modifier.size(batteryLevelIndicator.toIconHighSize().dp)
-                            )
+                            Box(modifier = Modifier.width(48.dp)) {
+                                Icon(
+                                    painter = painterResource(R.drawable.union),
+                                    contentDescription = null,
+                                    tint = batteryLevelIconHighColor,
+                                    modifier = Modifier
+                                        .size(
+                                            animatedIconHighSize.dp
+                                        )
+
+
+                                )
+                            }
                         }
                     }
                 }
