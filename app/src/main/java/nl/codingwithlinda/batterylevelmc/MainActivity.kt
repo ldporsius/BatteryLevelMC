@@ -6,8 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
@@ -70,7 +68,7 @@ class MainActivity : ComponentActivity() {
                     mapBatteryLevelToIndicator(batteryLevel ?: 0f)
                 }
             }
-            val batteryLevelIndicatorColor = batteryLevelIndicator.toColor()
+
             val batteryLevelIconLowColor = batteryLevelIndicator.toIconLowColor()
             val batteryLevelIconHighColor = batteryLevelIndicator.toIconHighColor()
 
@@ -82,7 +80,7 @@ class MainActivity : ComponentActivity() {
                 ),
                 label = "animatedLevelWidth"
             )
-            val animatedBarColorLowToMedium by animateColorAsState(
+            val animatedBarColor by animateColorAsState(
                 targetValue = batteryLevelIndicator.toColor(),
                 animationSpec = tween(3000),
                 label = "animatedBarColorLowToMedium"
@@ -211,7 +209,7 @@ class MainActivity : ComponentActivity() {
                                     )
 
                                     drawRoundRect(
-                                        color = animatedBarColorLowToMedium,
+                                        color = animatedBarColor,
                                         size = Size(
                                             width = sizeBattery * animatedLevelWidth.value,
                                             height = maxSize.height
